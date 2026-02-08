@@ -1,10 +1,11 @@
 /* Light theme */
 [data-theme="light"] {
-  --bg-main: #f8fafc;
-  --bg-secondary: #ffffff;
-  --text-main: #0f172a;
+  --bg-main: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --text-main: #121212;
   --text-muted: #475569;
-  --border: #e2e8f0;
+  --chat-tog-bg: #ffffff;
+  --border: #cacfd6;
 }
 
 /* Dark theme */
