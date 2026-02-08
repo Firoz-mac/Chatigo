@@ -1,0 +1,67 @@
+.loginAndReg{
+    width: 100%;
+    height: 100vh;
+    background-color: var(--bg-main);
+    display: flex;
+    padding: 20px;
+    justify-content: space-between;
+    color: white;
+}
+.leftSec{
+    width: 40%;
+    height: 100%;
+    background-color: white;
+    border-radius: 10px;
+}
+.leftSec .slideImg{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.rightSec{
+    width: 55%;
+    height: 100%;
+    background-color: rgb(70, 0, 0);
+    display: flex;
+    flex-direction: column;
+    padding: 100px;
+    justify-content: center;
+    gap: 20px;
+}
+.rightSec .authForm{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.authForm input{
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+.authForm .passWrapper{
+    width: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+}
+.passWrapper input{
+    width: 100%;
+    padding: 0px;
+    border: none;
+    outline: none;
+}
+.rightSec .googleAccSec{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+}
