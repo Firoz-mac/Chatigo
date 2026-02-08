@@ -47,10 +47,6 @@
     opacity: 0.7;
 }
 
-.toggle-link:focus {
-    outline: 2px solid #017feb;
-    outline-offset: 2px;
-}
 .rightSec .authForm{
     display: flex;
     flex-direction: column;
