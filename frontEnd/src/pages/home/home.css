@@ -33,6 +33,24 @@
     font-size: 24px;
     cursor: pointer;
 }
+.logoSec .headRightSec{
+  display: flex;
+  align-items: center;
+}
+.headRightSec .ownProfile{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: white;
+  margin-left: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.ownProfile img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .chatListHead .inputWrapper{
     width: 100%;
     background-color: transparent;
@@ -259,6 +277,11 @@
 @media (max-width: 480px) {
   .logoSec img {
     width: 100px;
+  }
+  .ownProfile img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .chatHeadProfileSec .profileWrapper {

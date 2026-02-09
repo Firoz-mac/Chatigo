@@ -17,7 +17,9 @@ import Message from '../../components/message/Message';
 
 const Home = () => {
     const [chatOpen, setChatOpen] = useState(false);
+    const [messageInput, setMessageInput] = useState('')
     const bottomRef=useRef(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (chatOpen) {
@@ -25,13 +27,22 @@ const Home = () => {
         }
     }, [chatOpen])
 
+    const handleMessageInput=(e)=>{
+        setMessageInput(e.target.value);
+    }
+
   return (
     <div className={`home ${chatOpen ? 'chatOpen' : ''}`}>
         <div className="chatList">
             <div className="chatListHead">
                 <div className="logoSec">
                     <img src={logo} alt="Chatigo" />
-                    <IoIosAddCircle className='addIcon'/>
+                    <div className="headRightSec">
+                        <IoIosAddCircle className='addIcon'/>
+                        <div className="ownProfile">
+                            <img src="https://t3.ftcdn.net/jpg/06/99/46/60/360_F_699466075_DaPTBNlNQTOwwjkOiFEoOvzDV0ByXR9E.jpg" alt="" />
+                        </div>
+                    </div>
                 </div>
                 <div className="inputWrapper">
                     <IoSearchOutline className='searchIcon' />
@@ -94,11 +105,11 @@ const Home = () => {
                 </div>
                 <div className="chatInputSec">
                     <BsEmojiSmile className='emojiIcon'/>
-                    <input type="text" placeholder='Type a message'/>
-                    <IoIosAttach  className='attachIcon'/>
+                    <input onChange={handleMessageInput} value={messageInput} type="text" placeholder='Type a message'/>
+                    <IoIosAttach  className='attachIcon' onClick={() => fileInputRef.current.click()}/>
+                    <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
                     <div className="btn">
-                        {/* <IoMdSend /> */}
-                        <MdKeyboardVoice />
+                        {messageInput.trim() === '' ? <MdKeyboardVoice /> : <IoMdSend />}
                     </div>
                 </div>
             </>
