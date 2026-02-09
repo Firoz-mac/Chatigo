@@ -76,9 +76,33 @@
     border-bottom: 1px solid var(--border);
     padding: 15px 20px;
 }
+.chat .chatUnselected{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chatUnselected span {
+  color: var(--text-muted);
+  background-color: rgba(255, 255, 255, 0.066);
+  padding: 5px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+}
 .chatHead .chatHeadProfileSec{
     display: flex;
+    align-items: center;
 }
+.chatHeadProfileSec .backArrowIcon{
+    font-size: 25px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.backArrowIcon {
+  display: none;
+}
+
 .chatHeadProfileSec .profileWrapper{
     width: 50px;
     height: 50px;
@@ -220,5 +244,31 @@
   .chat .chatInputSec {
     padding: 10px 15px;
     gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .backArrowIcon {
+    display: block;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoSec img {
+    width: 100px;
+  }
+
+  .chatHeadProfileSec .profileWrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .chatInputSec .btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
   }
 }
