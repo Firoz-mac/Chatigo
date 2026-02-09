@@ -10,8 +10,8 @@
 
 /* Dark theme */
 [data-theme="dark"] {
-  --bg-main: #121212;
-  --bg-secondary: #181818;
+  --bg-main: #141414;
+  --bg-secondary: #272727;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --chat-tog-bg: #292929;

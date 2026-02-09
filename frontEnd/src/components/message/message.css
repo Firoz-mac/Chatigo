@@ -1,0 +1,32 @@
+.chatMessage {
+  max-width: 65%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.chatMessage.me .messageTime {
+  font-size: 10px;
+  color: white;
+  align-self: flex-start;
+}
+.chatMessage .messageTime {
+  font-size: 10px;
+  color: var(--text-muted);
+  align-self: flex-end;
+}
+.chatMessage.me {
+  align-self: flex-end;
+  background-color: #017feb;
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+.chatMessage.other {
+  align-self: flex-start;
+  background-color: #383838;
+  color: white;
+  border-bottom-left-radius: 6px;
+}

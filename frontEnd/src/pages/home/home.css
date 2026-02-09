@@ -1,0 +1,224 @@
+.home{
+    width: 100%;
+    height: 100vh;
+    background-color: var(--bg-main);
+    color: white;
+    display: flex;
+}
+.home .chatList{
+    width: 30%;
+    height: 100%;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+.chatList .chatListHead{
+    width: 100%;
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.chatListHead .logoSec{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logoSec img{
+    width: 120px;
+}
+.logoSec .addIcon{
+    font-size: 24px;
+    cursor: pointer;
+}
+.chatListHead .inputWrapper{
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 0px 10px;
+}
+.inputWrapper .searchIcon{
+    font-size: 18px;
+}
+.inputWrapper input{
+    width: 100%;
+    padding: 8px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: var(--text-main);
+}
+.chatList .chatListBody{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+.chatListBody::-webkit-scrollbar {
+  display: none;
+}
+.home .chat{
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.chat .chatHead{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding: 15px 20px;
+}
+.chatHead .chatHeadProfileSec{
+    display: flex;
+}
+.chatHeadProfileSec .profileWrapper{
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+}
+.chatHeadProfileSec .profileInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.profileInfo .status{
+    color: #017feb;
+    font-size: 12px;
+}
+.chatHeadIcons{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.chatHeadIcons .icon{
+    font-size: 22px;
+    cursor: pointer;
+}
+.chat .chatContent{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    overflow-y: scroll;
+    background-color: var(--bg-secondary);
+}
+.chatContent::-webkit-scrollbar {
+  display: none;
+}
+.chat .chatInputSec{
+    width: 100%;
+    display: flex;
+    border-top: 1px solid var(--border);
+    align-items: center;
+    padding: 10px 30px;
+    gap: 20px;
+}
+.chatInputSec .emojiIcon{
+    font-size: 22px;
+    cursor: pointer;
+}
+.chatInputSec input{
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: var(--text-main);
+}
+.chatInputSec .attachIcon{
+    font-size: 22px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.chatInputSec .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  background-color: #017feb;
+  color: white;
+
+  border-radius: 50%;
+  cursor: pointer;
+
+  font-size: 18px;
+
+  transition: 
+    background-color 0.25s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (max-width: 1024px) {
+  .home .chatList {
+    width: 35%;
+  }
+
+  .chatListHead {
+    padding: 15px 20px;
+  }
+
+  .chat .chatHead {
+    padding: 12px 15px;
+  }
+
+  .chat .chatInputSec {
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home {
+    flex-direction: column;
+  }
+
+  /* Chat List takes full screen */
+  .home .chatList {
+    width: 100%;
+    height: 100vh;
+  }
+
+  /* Hide chat by default on mobile */
+  .home .chat {
+    display: none;
+  }
+
+  /* When chat is active */
+  .home.chatOpen .chat {
+    display: flex;
+  }
+
+  .home.chatOpen .chatList {
+    display: none;
+  }
+
+  /* Smaller paddings */
+  .chatListHead {
+    padding: 15px;
+  }
+
+  .chat .chatContent {
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .chat .chatInputSec {
+    padding: 10px 15px;
+    gap: 12px;
+  }
+}

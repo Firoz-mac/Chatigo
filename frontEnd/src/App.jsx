@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import LoginAndReg from './pages/LoginAndReg/LoginAndReg'
 import LogoLoader from './components/logoLoader/LogoLoader'
+import Home from './pages/home/Home'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -27,6 +28,7 @@ function App() {
     <>
     <Routes>
       <Route path='/SignUp' element={<LoginAndReg/>}/>
+      <Route path='/Chatigo' element={<Home/>}/>
     </Routes>
     </>
   )
