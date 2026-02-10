@@ -30,6 +30,7 @@
     width: 120px;
 }
 .logoSec .addIcon{
+    color: var(--text-muted);
     font-size: 24px;
     cursor: pointer;
 }
@@ -61,6 +62,7 @@
     padding: 0px 10px;
 }
 .inputWrapper .searchIcon{
+    color: var(--text-muted);
     font-size: 18px;
 }
 .inputWrapper input{
@@ -134,6 +136,10 @@
     flex-direction: column;
     justify-content: center;
 }
+.profileInfo .chatName{
+    color: var(--text-main);
+    font-weight: 500;
+}
 .profileInfo .status{
     color: #017feb;
     font-size: 12px;
@@ -144,6 +150,7 @@
     gap: 20px;
 }
 .chatHeadIcons .icon{
+    color: var(--text-muted);
     font-size: 22px;
     cursor: pointer;
 }
@@ -168,6 +175,7 @@
     gap: 20px;
 }
 .chatInputSec .emojiIcon{
+    color: var(--text-muted);
     font-size: 22px;
     cursor: pointer;
 }
@@ -180,6 +188,7 @@
     color: var(--text-main);
 }
 .chatInputSec .attachIcon{
+    color: var(--text-muted);
     font-size: 22px;
     cursor: pointer;
     margin-left: 10px;

@@ -12,8 +12,6 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark')
 
-    const seen = localStorage.getItem('seenLoader')
-
     const timer = setTimeout(() => {
       setLoading(false)
     }, 1800)
@@ -27,7 +25,7 @@ function App() {
   return (
     <>
     <Routes>
-      <Route path='/SignUp' element={<LoginAndReg/>}/>
+      <Route path='/' element={<LoginAndReg/>}/>
       <Route path='/Chatigo' element={<Home/>}/>
     </Routes>
     </>

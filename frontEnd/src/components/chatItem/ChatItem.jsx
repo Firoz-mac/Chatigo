@@ -9,7 +9,7 @@ const ChatItem = ({onClick}) => {
         </div>
         <div className="chatItemDetail">
             <div className="chatItemHead">
-                <span>Mac</span>
+                <span className='userName'>Mac</span>
                 <span className='timestamp'>2:15 am</span>
             </div>
             <div className="chatItemContent">

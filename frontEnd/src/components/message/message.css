@@ -15,7 +15,7 @@
 }
 .chatMessage .messageTime {
   font-size: 10px;
-  color: var(--text-muted);
+  color: white;
   align-self: flex-end;
 }
 .chatMessage.me {
