@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
-import './loginAndReg.css'
-import image1 from '../../assets/AuthSlide/1.webp'
-import image2 from '../../assets/AuthSlide/2.webp'
-import image3 from '../../assets/AuthSlide/3.webp'
-import image4 from '../../assets/AuthSlide/4.webp'
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useNavigate } from "react-router-dom";
+import './loginAndReg.css';
+import api from '../../api/axios';
+import image1 from '../../assets/AuthSlide/1.webp';
+import image2 from '../../assets/AuthSlide/2.webp';
+import image3 from '../../assets/AuthSlide/3.webp';
+import image4 from '../../assets/AuthSlide/4.webp';
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 
 const LoginAndReg = () => {
     const slideImages = useMemo(() => [image1, image2, image3, image4], []);
     
     const [pageValue, setPageValue] = useState('login');
     const [currentImage, setCurrentImage] = useState(image4);
+    const navigate = useNavigate();
     const [eyeValue, setEyeValue] = useState({
         password: false,
         confirmPassword: false,
@@ -53,7 +55,8 @@ const LoginAndReg = () => {
     }, []);
 
     const handleCheckBox = useCallback((e) => {
-        setCheckBoxValue(e.target.checked);
+        const checked = e.target.checked;
+        setCheckBoxValue(checked);
     }, []);
 
     const handleSubmit = useCallback((e) => {
@@ -70,6 +73,47 @@ const LoginAndReg = () => {
         handlePageValue(isLogin ? 'register' : 'login');
     }, [isLogin, handlePageValue]);
 
+    //handle Create Account
+    const handleCreateAccount=useCallback(async()=>{
+        if(userInputs.password !== userInputs.confirmPassword){
+            console.log('Passwords do not match');
+            return;
+        }
+        if (checkBoxValue === false) {
+            console.log('Please agree to the terms and conditions');
+            console.log(checkBoxValue);
+            return;
+        }
+        try{
+            const res=await api.post('/auth/register',{
+                userName:userInputs.username,
+                email:userInputs.email,
+                password:userInputs.password,
+            });
+            console.log(res.data);
+        }catch(err){
+            console.log(err.response.data);
+        }
+    },[userInputs, checkBoxValue]);
+
+    //handle Login
+    const handleLogin=useCallback(async()=>{
+        try{
+            const res=await api.post('/auth/login',{
+                email:userInputs.email,
+                password:userInputs.password,
+            });
+            console.log(res.data);
+            const { token, data } = res.data;
+            localStorage.setItem("token", token);
+            if(token){
+                navigate('/chatigo');
+            }
+        }catch(err){
+            console.log(err.response.data);
+        }
+    },[userInputs]);
+
     return (
         <div className="loginAndReg">
             <div className="leftSec">
@@ -82,11 +126,11 @@ const LoginAndReg = () => {
                 </div>
                 <form className='authForm' onSubmit={handleSubmit}>
                     {!isLogin && (
-                        <input onChange={handleUserInputs} type="text" name='username' placeholder='Username' />
+                        <input onChange={handleUserInputs} type="text" name='username' placeholder='Username' required />
                     )}
-                    <input onChange={handleUserInputs} type="text" name='email' placeholder='Email'/>
+                    <input onChange={handleUserInputs} type="text" name='email' placeholder='Email' required/>
                     <div className="passWrapper">
-                        <input onChange={handleUserInputs} type={eyeValue.password ? "text" : "password"} name='password' placeholder='Password'/>
+                        <input onChange={handleUserInputs} type={eyeValue.password ? "text" : "password"} name='password' placeholder='Password' required/>
                         <button 
                             type="button"
                             className='eyeIcon' 
@@ -115,14 +159,8 @@ const LoginAndReg = () => {
                         </div>
                         </>
                     )}
-                    <button type='submit'>{isLogin ? 'Login' : 'Create Account'}</button>
+                    <button onClick={isLogin? handleLogin : handleCreateAccount} type='submit'>{isLogin ? 'Login' : 'Create Account'}</button>
                 </form>
-                <div className="divider">
-                    <span>Or</span>
-                </div>
-                <div className="googleAccSec">
-                    <FcGoogle />
-                </div>
             </div>
         </div>
     )
