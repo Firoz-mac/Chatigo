@@ -13,13 +13,25 @@ import { MdKeyboardVoice } from "react-icons/md";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 import ChatItem from '../../components/chatItem/ChatItem';
 import Message from '../../components/message/Message';
+import api from '../../api/axios';
+import { useQuery } from "@tanstack/react-query";
 
+
+const fetchLoggedUserData=async()=>{
+    const res=await api.get('/auth/userData');
+    return res.data.data;
+};
 
 const Home = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [messageInput, setMessageInput] = useState('')
     const bottomRef=useRef(null);
     const fileInputRef = useRef(null);
+
+    const { data: user, isLoading, isError } = useQuery({
+        queryKey: ["loggedUserData"],
+        queryFn: fetchLoggedUserData,
+    });
 
     useEffect(() => {
         if (chatOpen) {

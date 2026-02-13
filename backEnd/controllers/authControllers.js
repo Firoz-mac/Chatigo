@@ -53,7 +53,7 @@ const login=async (req,res)=>{
         }
 
         //finding user
-        const user=await userModel.findOne({email});
+        const user=await userModel.findOne({email}).select('+password');
 
         if(!user){
             return res.status(400).json({
@@ -94,4 +94,20 @@ const login=async (req,res)=>{
     }
 };
 
-module.exports={createAccount,login};
+
+//get logged user data
+const getLoggedUserData=async(req,res)=>{
+    try{
+        res.status(200).json({
+            success: true,
+            data:req.user
+        });
+    }catch(err){
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+module.exports={createAccount,login,getLoggedUserData};

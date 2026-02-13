@@ -21,7 +21,7 @@ const routeProtection=async (req,res,next)=>{
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
 
         //attach user to request
-        req.user=await userModel.findById(decoded.id).select('-password');
+        req.user=await userModel.findById(decoded.id);
         next();
     }catch(err){
         res.status(401).json({

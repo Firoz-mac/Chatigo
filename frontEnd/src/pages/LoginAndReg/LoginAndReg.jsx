@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
 import './loginAndReg.css';
+import authStore from '../../store/authStore';
 import api from '../../api/axios';
 import image1 from '../../assets/AuthSlide/1.webp';
 import image2 from '../../assets/AuthSlide/2.webp';
@@ -10,6 +11,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 const LoginAndReg = () => {
     const slideImages = useMemo(() => [image1, image2, image3, image4], []);
+    const { login } = authStore();
     
     const [pageValue, setPageValue] = useState('login');
     const [currentImage, setCurrentImage] = useState(image4);
@@ -105,7 +107,9 @@ const LoginAndReg = () => {
             });
             console.log(res.data);
             const { token, data } = res.data;
-            localStorage.setItem("chatigo",JSON.stringify({token,email:data.email}));
+            localStorage.setItem("chatigo",JSON.stringify({token}));
+
+            login(data, token);
 
             if(res.data.token){
                 navigate('/chatigo');
