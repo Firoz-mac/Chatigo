@@ -105,8 +105,9 @@ const LoginAndReg = () => {
             });
             console.log(res.data);
             const { token, data } = res.data;
-            localStorage.setItem("token", token);
-            if(token){
+            localStorage.setItem("chatigo",JSON.stringify({token,email:data.email}));
+
+            if(res.data.token){
                 navigate('/chatigo');
             }
         }catch(err){
