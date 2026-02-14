@@ -17,24 +17,42 @@ import Message from '../../components/message/Message';
 import api from '../../api/axios';
 import { useQuery } from "@tanstack/react-query";
 import ChatProfile from '../../components/chatProfile/ChatProfile';
-
-
-const fetchLoggedUserData=async()=>{
-    const res=await api.get('/auth/userData');
-    return res.data.data;
-};
+import {fetchLoggedUserData} from '../../api/authApi';
+import {fetchSearchingUsers} from '../../api/userApi';
 
 const Home = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [messageInput, setMessageInput] = useState('')
     const [addChatBtnValue, setAddChatBtnValue] = useState(false);
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const bottomRef=useRef(null);
     const fileInputRef = useRef(null);
 
-    const { data: user, isLoading, isError } = useQuery({
+    const { data: loggedUserData, isLoading, isError } = useQuery({
         queryKey: ["loggedUserData"],
         queryFn: fetchLoggedUserData,
     });
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    },[search]);
+
+    const {data: searchedUsers, isFetching,} = useQuery({
+        queryKey: ["searchedUsers", debouncedSearch],
+        queryFn: () => fetchSearchingUsers(debouncedSearch),
+        enabled:  debouncedSearch.length > 0,
+    });
+
+    useEffect(() => {
+        console.log("Searched Users:", searchedUsers);
+    },[searchedUsers]);
 
     useEffect(() => {
         if (chatOpen) {
@@ -44,11 +62,13 @@ const Home = () => {
 
     const handleMessageInput=(e)=>{
         setMessageInput(e.target.value);
-    }
+    };
 
     const handleAddChatButton=()=>{
         setAddChatBtnValue(prev => !prev);
-    }
+    };
+
+    
 
   return (
     <div className={`home ${chatOpen ? 'chatOpen' : ''}`}>
@@ -65,7 +85,7 @@ const Home = () => {
                 </div>
                 <div className="inputWrapper">
                     <IoSearchOutline className='searchIcon' />
-                    <input type="text" placeholder='Search Chat'/>
+                    <input type="text"  onChange={(e) => setSearch(e.target.value)} placeholder='Search Chat'/>
                 </div>
             </div>
             {addChatBtnValue?
