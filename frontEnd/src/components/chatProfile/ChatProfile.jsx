@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './chatProfile.css'
 
-const ChatProfile = () => {
+const ChatProfile = ({user}) => {
+
   return (
     <div className='chatProfile'>
         <div className="profileWrapper">
-            <img src="https://plus.unsplash.com/premium_photo-1690407617686-d449aa2aad3c?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGZlbWFsZSUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D" alt="" />
+            <img src={user.profileImg || "https://static.vecteezy.com/system/resources/previews/024/766/958/non_2x/default-male-avatar-profile-icon-social-media-user-free-vector.jpg"} alt="" />
         </div>
-        <span>Mac</span>
+        <span>{user.userName}</span>
     </div>
   )
 }

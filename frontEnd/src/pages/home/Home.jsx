@@ -79,20 +79,22 @@ const Home = () => {
                     <div className="headRightSec">
                         {addChatBtnValue ? <PiMinusCircleFill onClick={()=>handleAddChatButton()} className='addIcon'/> :<IoIosAddCircle onClick={()=>handleAddChatButton()} className='addIcon'/>}
                         <div className="ownProfile">
-                            <img src="https://t3.ftcdn.net/jpg/06/99/46/60/360_F_699466075_DaPTBNlNQTOwwjkOiFEoOvzDV0ByXR9E.jpg" alt="" />
+                            <img src={loggedUserData?.profileImg? loggedUserData.profileImg: "https://static.vecteezy.com/system/resources/previews/024/766/958/non_2x/default-male-avatar-profile-icon-social-media-user-free-vector.jpg"} alt="" />
                         </div>
                     </div>
                 </div>
                 <div className="inputWrapper">
                     <IoSearchOutline className='searchIcon' />
-                    <input type="text"  onChange={(e) => setSearch(e.target.value)} placeholder='Search Chat'/>
+                    <input type="text"  onChange={addChatBtnValue? (e) => setSearch(e.target.value):null} placeholder='Search Chat'/>
                 </div>
             </div>
             {addChatBtnValue?
             <div className="chatListBodyAddChat">
-                <ChatProfile/>
-                <ChatProfile/>
-                <ChatProfile/>
+                {searchedUsers?.map((users)=>{
+                    return (
+                        <ChatProfile key={users._id} user={users}/>
+                    );
+                })}
             </div>
             :
             <div className="chatListBody">
