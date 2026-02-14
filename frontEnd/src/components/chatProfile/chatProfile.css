@@ -1,0 +1,18 @@
+.chatProfile{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    gap: 10px;
+    padding: 10px 30px;
+    align-items: center;
+    cursor: pointer;
+}
+.chatProfile:hover{
+    background-color: var(--hover-bg);
+}
+.chatProfile .profileWrapper{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}

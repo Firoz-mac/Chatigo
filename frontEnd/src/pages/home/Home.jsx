@@ -11,10 +11,12 @@ import { IoMdSend } from "react-icons/io";
 import { IoIosAttach } from "react-icons/io";
 import { MdKeyboardVoice } from "react-icons/md";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import { PiMinusCircleFill } from "react-icons/pi";
 import ChatItem from '../../components/chatItem/ChatItem';
 import Message from '../../components/message/Message';
 import api from '../../api/axios';
 import { useQuery } from "@tanstack/react-query";
+import ChatProfile from '../../components/chatProfile/ChatProfile';
 
 
 const fetchLoggedUserData=async()=>{
@@ -25,6 +27,7 @@ const fetchLoggedUserData=async()=>{
 const Home = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [messageInput, setMessageInput] = useState('')
+    const [addChatBtnValue, setAddChatBtnValue] = useState(false);
     const bottomRef=useRef(null);
     const fileInputRef = useRef(null);
 
@@ -43,6 +46,10 @@ const Home = () => {
         setMessageInput(e.target.value);
     }
 
+    const handleAddChatButton=()=>{
+        setAddChatBtnValue(prev => !prev);
+    }
+
   return (
     <div className={`home ${chatOpen ? 'chatOpen' : ''}`}>
         <div className="chatList">
@@ -50,7 +57,7 @@ const Home = () => {
                 <div className="logoSec">
                     <img src={logo} alt="Chatigo" />
                     <div className="headRightSec">
-                        <IoIosAddCircle className='addIcon'/>
+                        {addChatBtnValue ? <PiMinusCircleFill onClick={()=>handleAddChatButton()} className='addIcon'/> :<IoIosAddCircle onClick={()=>handleAddChatButton()} className='addIcon'/>}
                         <div className="ownProfile">
                             <img src="https://t3.ftcdn.net/jpg/06/99/46/60/360_F_699466075_DaPTBNlNQTOwwjkOiFEoOvzDV0ByXR9E.jpg" alt="" />
                         </div>
@@ -61,6 +68,13 @@ const Home = () => {
                     <input type="text" placeholder='Search Chat'/>
                 </div>
             </div>
+            {addChatBtnValue?
+            <div className="chatListBodyAddChat">
+                <ChatProfile/>
+                <ChatProfile/>
+                <ChatProfile/>
+            </div>
+            :
             <div className="chatListBody">
                 <ChatItem onClick={() => setChatOpen(true)}/>
                 <ChatItem/>
@@ -81,6 +95,7 @@ const Home = () => {
                 <ChatItem/>
                 <ChatItem/>
             </div>
+            }
         </div>
         <div className="chat">
             {chatOpen ?
