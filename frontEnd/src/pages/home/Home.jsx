@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import './home.css'
 import logo from '../../assets/Logo/ChatigoLogoWithNameDark.png'
 import { IoIosAddCircle } from "react-icons/io";
@@ -19,13 +19,15 @@ import { useQuery } from "@tanstack/react-query";
 import ChatProfile from '../../components/chatProfile/ChatProfile';
 import {fetchLoggedUserData} from '../../api/authApi';
 import {fetchSearchingUsers} from '../../api/userApi';
+import { fetchConversations } from '../../api/conversationApi';
+import selectedChatStore from './../../store/selectedChatStore';
 
 const Home = () => {
-    const [chatOpen, setChatOpen] = useState(false);
     const [messageInput, setMessageInput] = useState('')
     const [addChatBtnValue, setAddChatBtnValue] = useState(false);
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const {setSelectedConversation,selectedConversation} =selectedChatStore();
     const bottomRef=useRef(null);
     const fileInputRef = useRef(null);
 
@@ -50,15 +52,23 @@ const Home = () => {
         enabled:  debouncedSearch.length > 0,
     });
 
+    const {data: conversations}= useQuery({
+        queryKey: ["conversations"],
+        queryFn: fetchConversations,
+    });
+
+    const otherUserInChat = selectedConversation?.participants?.find(
+        (p) => p._id !== loggedUserData?._id
+    );
+
+    useEffect(() => {
+        console.log("conversations:", conversations);
+    },[conversations]);
+    
+
     useEffect(() => {
         console.log("Searched Users:", searchedUsers);
     },[searchedUsers]);
-
-    useEffect(() => {
-        if (chatOpen) {
-            bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-        }
-    }, [chatOpen])
 
     const handleMessageInput=(e)=>{
         setMessageInput(e.target.value);
@@ -71,7 +81,7 @@ const Home = () => {
     
 
   return (
-    <div className={`home ${chatOpen ? 'chatOpen' : ''}`}>
+    <div className={`home ${selectedConversation ? 'chatOpen' : ''}`}>
         <div className="chatList">
             <div className="chatListHead">
                 <div className="logoSec">
@@ -98,38 +108,30 @@ const Home = () => {
             </div>
             :
             <div className="chatListBody">
-                <ChatItem onClick={() => setChatOpen(true)}/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
-                <ChatItem/>
+                {conversations?.map((conversation)=>{
+                    const otherUser = conversation.participants.find(
+                        (p)=>p._id !== loggedUserData?._id
+                    );
+
+                    return (
+                        <ChatItem key={conversation._id} userName={otherUser?.userName} profileImg={otherUser?.profileImg} lastMessage={conversation.lastMessage} onClick={() => setSelectedConversation(conversation)}/>
+
+                    )
+                })}
             </div>
             }
         </div>
         <div className="chat">
-            {chatOpen ?
+            {selectedConversation  ?
             <>
                 <div className="chatHead">
                     <div className="chatHeadProfileSec">
-                        <MdOutlineKeyboardArrowLeft className='backArrowIcon' onClick={() => setChatOpen(false)} />
+                        <MdOutlineKeyboardArrowLeft className='backArrowIcon' onClick={() => setSelectedConversation(null)} />
                         <div className="profileWrapper">
-                            <img src="https://plus.unsplash.com/premium_photo-1690407617686-d449aa2aad3c?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGZlbWFsZSUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D" alt="" />
+                            <img src={otherUserInChat?.profileImg || "https://static.vecteezy.com/system/resources/previews/024/766/958/non_2x/default-male-avatar-profile-icon-social-media-user-free-vector.jpg"} alt="" />
                         </div>
                         <div className="profileInfo">
-                            <span className='chatName'>Mac</span>
+                            <span className='chatName'>{otherUserInChat?.userName}</span>
                             <span className='status'>Online</span>
                         </div>
                     </div>

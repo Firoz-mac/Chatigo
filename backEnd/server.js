@@ -14,9 +14,11 @@ app.use(cors({
 
 const authRoutes = require('./routes/authRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+const conversationRoutes = require('./routes/conversationRoutes');
 
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
+app.use('/conversations', conversationRoutes);
 
 
 app.listen(process.env.PORT,()=>{
