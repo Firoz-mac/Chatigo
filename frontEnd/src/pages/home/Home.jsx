@@ -19,8 +19,10 @@ import { useQuery } from "@tanstack/react-query";
 import ChatProfile from '../../components/chatProfile/ChatProfile';
 import {fetchLoggedUserData} from '../../api/authApi';
 import {fetchSearchingUsers} from '../../api/userApi';
-import { fetchConversations } from '../../api/conversationApi';
+import { fetchConversations ,createOrGetConversation } from '../../api/conversationApi';
 import selectedChatStore from './../../store/selectedChatStore';
+import { fetchMessages, sendMessage } from './../../api/messageApi';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Home = () => {
     const [messageInput, setMessageInput] = useState('')
@@ -61,6 +63,14 @@ const Home = () => {
         (p) => p._id !== loggedUserData?._id
     );
 
+    const queryClient = useQueryClient();
+
+    const { data: messages } = useQuery({
+    queryKey: ["messages", selectedConversation?._id],
+    queryFn: () => fetchMessages(selectedConversation._id),
+    enabled: !!selectedConversation,
+    });
+
     useEffect(() => {
         console.log("conversations:", conversations);
     },[conversations]);
@@ -70,6 +80,10 @@ const Home = () => {
         console.log("Searched Users:", searchedUsers);
     },[searchedUsers]);
 
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     const handleMessageInput=(e)=>{
         setMessageInput(e.target.value);
     };
@@ -77,6 +91,27 @@ const Home = () => {
     const handleAddChatButton=()=>{
         setAddChatBtnValue(prev => !prev);
     };
+
+    const { mutate: sendMessageMutate } = useMutation({
+        mutationFn: sendMessage,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["messages", selectedConversation._id] });
+            queryClient.invalidateQueries({ queryKey: ["conversations"] });
+            setMessageInput("");
+        },
+    });
+
+    const { mutate: createConversationMutate } = useMutation({
+        mutationFn: createOrGetConversation,
+        onSuccess: (conversation) => {
+            setSelectedConversation(conversation);
+
+            queryClient.invalidateQueries({ queryKey: ["conversations"] });
+
+            setAddChatBtnValue(false);
+            setSearch("");
+        }
+    });
 
     
 
@@ -102,7 +137,7 @@ const Home = () => {
             <div className="chatListBodyAddChat">
                 {searchedUsers?.map((users)=>{
                     return (
-                        <ChatProfile key={users._id} user={users}/>
+                        <ChatProfile key={users._id} user={users} onClick={() => createConversationMutate(users._id)}/>
                     );
                 })}
             </div>
@@ -142,24 +177,37 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="chatContent">
-                    <Message sender="me"/>
-                    <Message sender="other"/>
-                    <Message sender="me"/>
-                    <Message sender="me"/>
-                    <Message sender="other"/>
-                    <Message sender="other"/>
-                    <Message sender="other"/>
-                    <Message sender="me"/>
-                    <Message sender="me"/>
-                    <Message sender="me"/>
+                    {messages? (
+                        messages.map((msg)=>(
+                            <Message key={msg._id} sender={msg.sender._id === loggedUserData?._id ? "me" : "other"} text={msg.text}/>
+                        ))
+                    ): <p>Loading messages...</p>}
                     <div ref={bottomRef} />
                 </div>
                 <div className="chatInputSec">
                     <BsEmojiSmile className='emojiIcon'/>
-                    <input onChange={handleMessageInput} value={messageInput} type="text" placeholder='Type a message'/>
+                    <input onChange={handleMessageInput} onKeyDown={(e)=>
+                    {
+                        if(e.key==='Enter' && messageInput.trim()){
+                            sendMessageMutate({
+                                conversationId: selectedConversation._id,
+                                text: messageInput,
+                            })
+                        }
+
+                    }
+                    } value={messageInput} type="text" placeholder='Type a message'/>
                     <IoIosAttach  className='attachIcon' onClick={() => fileInputRef.current.click()}/>
                     <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
-                    <div className="btn">
+                    <div className="btn" 
+                        onClick={()=>{ 
+                            if (!messageInput.trim() || !selectedConversation?._id) return;
+
+                            sendMessageMutate({
+                                conversationId: selectedConversation._id,
+                                text: messageInput,
+                            })
+                        }}>
                         {messageInput.trim() === '' ? <MdKeyboardVoice /> : <IoMdSend />}
                     </div>
                 </div>
