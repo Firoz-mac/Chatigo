@@ -205,7 +205,9 @@ const Home = () => {
                         messages.map((msg)=>{
                             const senderId= typeof msg.sender==="object"? msg.sender._id : msg.sender;
                             const isMe=senderId && loggedUserData?._id && senderId.toString() === loggedUserData._id.toString();
+                            return(
                             <Message key={msg._id} sender={isMe ? "me" : "other"} text={msg.text} createdAt={msg.createdAt}/>
+                            );
                         })
                     ): <p>Loading messages...</p>}
                     <div ref={bottomRef} />
