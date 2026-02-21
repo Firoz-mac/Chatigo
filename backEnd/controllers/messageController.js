@@ -15,6 +15,8 @@ const sendMessage = async (req, res) => {
       });
     }
 
+    // create message
+
     const message = await Message.create({
       conversation: conversationId,
       sender: senderId,
@@ -26,12 +28,23 @@ const sendMessage = async (req, res) => {
       lastMessage: text,
     });
 
+    const io = req.app.get("io");
+    const conversation= await Conversation.findById(conversationId);
+
+    const receiverId=conversation.participants.find(
+      (p)=>p.toString() !== senderId.toString()
+    );
+
+    //emit message to receiver room
+    io.to(receiverId.toString()).emit("receiveMessage", message);
+
     res.status(201).json({
       success: true,
       data: message,
     });
 
   } catch (err) {
+    console.log("SOCKET ERROR:",err)
     res.status(500).json({
       success: false,
       message: err.message,

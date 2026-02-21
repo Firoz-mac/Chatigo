@@ -1,11 +1,21 @@
 import React from 'react'
 import './message.css'
 
-const Message = (sender) => {
+const Message = ({sender, text, createdAt}) => {
+    console.log("createdAt:",createdAt)
+
+    const formatTime = (data)=>{
+        if(!data) return "";
+        return new Date(data).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
     return (
-        <div className={`chatMessage ${sender.sender}`}>
-            <span className="messageText">Hey! How’s it going?</span>
-            <span className="messageTime">2:15 AM</span>
+        <div className={`chatMessage ${sender}`}>
+            <span className="messageText">{text}</span>
+            <span className="messageTime">{formatTime(createdAt)}</span>
         </div>
     )
 }

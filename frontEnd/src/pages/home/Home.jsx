@@ -1,5 +1,6 @@
 import React, { use, useEffect, useRef, useState } from 'react'
 import './home.css'
+import socket from "../../socket";
 import logo from '../../assets/Logo/ChatigoLogoWithNameDark.png'
 import { IoIosAddCircle } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
@@ -30,6 +31,7 @@ const Home = () => {
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const {setSelectedConversation,selectedConversation} =selectedChatStore();
+    const queryClient = useQueryClient();
     const bottomRef=useRef(null);
     const fileInputRef = useRef(null);
 
@@ -48,6 +50,30 @@ const Home = () => {
         };
     },[search]);
 
+    useEffect(()=>{
+        if(loggedUserData?._id){
+            socket.emit("join", loggedUserData._id);
+        }
+    }, [loggedUserData]);
+
+    useEffect(()=>{
+        const handleReceiveMessage=(newMessage)=>{
+            queryClient.setQueryData(
+                ["messages", newMessage.conversation],
+                (old=[])=>[...old, newMessage]
+            );
+
+            //update conversation list automatically
+            queryClient.invalidateQueries({queryKey:["conversations"]});
+        };
+
+        socket.on("receiveMessage", handleReceiveMessage);
+
+        return ()=>{
+            socket.off("receiveMessage", handleReceiveMessage);
+        };
+    }, []);
+
     const {data: searchedUsers, isFetching,} = useQuery({
         queryKey: ["searchedUsers", debouncedSearch],
         queryFn: () => fetchSearchingUsers(debouncedSearch),
@@ -62,8 +88,6 @@ const Home = () => {
     const otherUserInChat = selectedConversation?.participants?.find(
         (p) => p._id !== loggedUserData?._id
     );
-
-    const queryClient = useQueryClient();
 
     const { data: messages } = useQuery({
     queryKey: ["messages", selectedConversation?._id],
@@ -178,9 +202,11 @@ const Home = () => {
                 </div>
                 <div className="chatContent">
                     {messages? (
-                        messages.map((msg)=>(
-                            <Message key={msg._id} sender={msg.sender._id === loggedUserData?._id ? "me" : "other"} text={msg.text}/>
-                        ))
+                        messages.map((msg)=>{
+                            const senderId= typeof msg.sender==="object"? msg.sender._id : msg.sender;
+                            const isMe=senderId && loggedUserData?._id && senderId.toString() === loggedUserData._id.toString();
+                            <Message key={msg._id} sender={isMe ? "me" : "other"} text={msg.text} createdAt={msg.createdAt}/>
+                        })
                     ): <p>Loading messages...</p>}
                     <div ref={bottomRef} />
                 </div>

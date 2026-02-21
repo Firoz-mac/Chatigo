@@ -6,6 +6,6 @@ export const fetchMessages = async (conversationId) => {
 };
 
 export const sendMessage = async (payload) => {
-  const res = await api.post("/messages", payload);
+  const res = await api.post("/messages/send", payload);
   return res.data.data;
 };
