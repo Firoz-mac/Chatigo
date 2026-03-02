@@ -11,6 +11,25 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 const LoginAndReg = () => {
     const slideImages = useMemo(() => [image1, image2, image3, image4], []);
+    const [resMessage,setResMessage]=useState({
+        status:"",
+        message:""
+    })
+
+    useEffect(()=>{
+        if(resMessage.message){
+            const timer = setTimeout(()=>{
+                setResMessage({
+                    status:'',
+                    message:''
+                });
+            }, 3000);
+
+            return ()=> clearTimeout(timer);
+        }
+    },[resMessage.message]);
+
+
     const { login } = authStore();
     
     const [pageValue, setPageValue] = useState('login');
@@ -116,6 +135,10 @@ const LoginAndReg = () => {
             }
         }catch(err){
             console.log(err.response.data);
+            setResMessage({
+                status:err.response.data.success,
+                message:err.response.data.message
+            })
         }
     },[userInputs]);
 
@@ -164,6 +187,7 @@ const LoginAndReg = () => {
                         </div>
                         </>
                     )}
+                    <p className={resMessage.status ? "success" : 'error'}>{resMessage.message}</p>
                     <button onClick={isLogin? handleLogin : handleCreateAccount} type='submit'>{isLogin ? 'Login' : 'Create Account'}</button>
                 </form>
             </div>
