@@ -1,7 +1,7 @@
 import React from 'react'
 import './chatItem.css'
 
-const ChatItem = ({ userName, profileImg, lastMessage, onClick}) => {
+const ChatItem = ({ userName, profileImg, lastMessage, onClick, unreadCount}) => {
   return (
     <div className='chatItem' onClick={onClick}>
         <div className="profileWrapper">
@@ -14,7 +14,10 @@ const ChatItem = ({ userName, profileImg, lastMessage, onClick}) => {
             </div>
             <div className="chatItemContent">
                 <span>{lastMessage}</span>
-                <div className="chatCount">1</div>
+                {unreadCount>0 && (
+                    <div className="chatCount">{unreadCount}</div>
+                )}
+                
             </div>
         </div>
     </div>

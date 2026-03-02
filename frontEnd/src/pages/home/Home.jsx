@@ -223,8 +223,17 @@ const Home = () => {
                     );
 
                     return (
-                        <ChatItem key={conversation._id} userName={otherUser?.userName} profileImg={otherUser?.profileImg} lastMessage={conversation.lastMessage} onClick={() => setSelectedConversation(conversation)}/>
-
+                        <ChatItem 
+                            key={conversation._id} 
+                            userName={otherUser?.userName} 
+                            profileImg={otherUser?.profileImg}
+                            unreadCount={ conversation.unreadCounts?.[loggedUserData?._id] || 0}
+                            lastMessage={conversation.lastMessage} 
+                            onClick={() => {
+                                setSelectedConversation(conversation); 
+                                api.put(`/messages/read/${conversation._id}`)
+                            }
+                        }/>
                     )
                 })}
             </div>
