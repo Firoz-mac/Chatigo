@@ -160,8 +160,6 @@ const Home = () => {
                 receiverId,
             });
         }, 1500);
-
-        console.log("emit typing", receiverId);
     };
 
     const handleAddChatButton=()=>{
