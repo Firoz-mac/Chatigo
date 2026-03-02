@@ -39,18 +39,39 @@ const io = new Server(server, {
 
 //io accessible in cotrollers
 app.set("io",io);
+const onlineUsers = new Map();
 
 io.on("connection", (socket)=>{
   console.log("User connected:", socket.id);
 
   socket.on("join", (userId)=>{
     socket.join(userId);
+    onlineUsers.set(userId, socket.id);
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+    console.log("Online users:", Array.from(onlineUsers.keys()));
     console.log(`User ${userId} Joined their room`);
   });
 
+  socket.on("typing", ({ senderId, receiverId})=>{
+    io.to(receiverId).emit("userTyping", senderId);
+  });
+
+  socket.on("stopTyping", ({senderId, receiverId})=>{
+    io.to(receiverId).emit("userStopTyping", senderId);
+  });
+
   socket.on("disconnect", ()=>{
+    for(let [userId, socketId] of onlineUsers.entries()){
+      if(socketId===socket.id){
+        onlineUsers.delete(userId);
+        break;
+      }
+    }
+
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
     console.log("User disconnected:", socket.id);
   });
+
 });
 
 server.listen(process.env.PORT, ()=>{

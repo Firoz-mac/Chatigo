@@ -27,6 +27,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Home = () => {
     const [messageInput, setMessageInput] = useState('')
+    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [isTyping, setIsTyping] = useState(false);
     const [addChatBtnValue, setAddChatBtnValue] = useState(false);
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -49,6 +51,37 @@ const Home = () => {
             clearTimeout(handler);
         };
     },[search]);
+
+    useEffect(()=>{
+        const handleOnlineUsers=(users)=>{
+            setOnlineUsers(users);
+        };
+        
+        socket.on("onlineUsers", handleOnlineUsers);
+
+        return ()=>{
+            socket.off("onlineUsers", handleOnlineUsers);
+        };
+
+    }, []);
+
+    useEffect(()=>{
+        const handleTyping=()=>{
+            setIsTyping(true);
+        };
+        const handleStopTyping=()=>{
+            setIsTyping(false)
+        };
+
+        socket.on("userTyping", handleTyping);
+        socket.on("userStopTyping", handleStopTyping);
+
+        return()=>{
+            socket.off("userTyping", handleTyping);
+            socket.off("userStopTyping", handleStopTyping);
+        };
+
+    },[]);
 
     useEffect(()=>{
         if(loggedUserData?._id){
@@ -110,6 +143,25 @@ const Home = () => {
 
     const handleMessageInput=(e)=>{
         setMessageInput(e.target.value);
+
+        if (!selectedConversation || !otherUserInChat?._id) return;
+        const receiverId=otherUserInChat?._id;
+
+        socket.emit("typing", {
+            senderId: loggedUserData._id,
+            receiverId,
+        });
+
+        //stop typing after 1.5 sec
+        clearTimeout(window.typingTimeout);
+        window.typingTimeout=setTimeout(()=>{
+            socket.emit("stopTyping", {
+                senderId: loggedUserData._id,
+                receiverId,
+            });
+        }, 1500);
+
+        console.log("emit typing", receiverId);
     };
 
     const handleAddChatButton=()=>{
@@ -191,7 +243,14 @@ const Home = () => {
                         </div>
                         <div className="profileInfo">
                             <span className='chatName'>{otherUserInChat?.userName}</span>
-                            <span className='status'>Online</span>
+                            <span className='status'>
+                                {isTyping
+                                    ? "Typing..."
+                                    : onlineUsers.includes(otherUserInChat?._id)
+                                    ? "Online" 
+                                    : "Offline"
+                                }
+                            </span>
                         </div>
                     </div>
                     <div className="chatHeadIcons">
