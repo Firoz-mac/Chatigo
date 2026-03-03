@@ -21,6 +21,8 @@ const sendMessage = async (req, res) => {
       conversation: conversationId,
       sender: senderId,
       text,
+      delivered: false,
+      seen: false,
     });
 
     const io = req.app.get("io");
@@ -32,6 +34,8 @@ const sendMessage = async (req, res) => {
     const receiverId=conversation.participants.find(
       (p)=>p.toString() !== senderId.toString()
     );
+
+    
 
     // increase receiver unread count
     conversation.unreadCounts.set(
@@ -101,4 +105,26 @@ const markAsRead = async (req,res)=>{
     }
 };
 
-module.exports = { sendMessage, getMessages, markAsRead };
+//mark message seen when opens chat
+const markMessagesAsSeen = async (req,res)=>{
+  try{
+    const{conversationId}=req.params;
+    const userId=req.user._id;
+    
+    await Message.updateMany(
+      {
+        conversation: conversationId,
+        sender: {$ne:userId},
+        seen: false,
+      },
+      {
+        $set:{seen:true},
+      }
+    );
+    res.status(200).json({ success:true });
+  }catch(err){
+    res.status(500).json({ success:false, message: err.message});
+  }
+}
+
+module.exports = { sendMessage, getMessages, markAsRead, markMessagesAsSeen};

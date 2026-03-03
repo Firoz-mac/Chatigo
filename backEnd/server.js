@@ -23,6 +23,9 @@ const usersRoutes = require('./routes/usersRoutes');
 const conversationRoutes = require('./routes/conversationRoutes');
 const messageRoutes= require('./routes/messageRoutes');
 
+//models
+const Message = require('./models/messageModel');
+
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
 app.use('/conversations', conversationRoutes);
@@ -59,6 +62,20 @@ io.on("connection", (socket)=>{
   socket.on("stopTyping", ({senderId, receiverId})=>{
     io.to(receiverId).emit("userStopTyping", senderId);
   });
+
+  socket.on("messageDelivered", async ({messageId})=>{
+    const message = await Message.findByIdAndUpdate(
+      messageId,
+      {delivered:true},
+      {new:true}
+    );
+
+    if(message){
+      io.to(message.sender.toString()).emit("messageDeliveredUpdate", {
+        messageId,
+      });
+    }
+  })
 
   socket.on("disconnect", ()=>{
     for(let [userId, socketId] of onlineUsers.entries()){

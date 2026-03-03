@@ -84,6 +84,26 @@ const Home = () => {
     },[]);
 
     useEffect(()=>{
+        const handleDeliveredUpdate=({messageId})=>{
+            queryClient.setQueryData(
+                ["messages", selectedConversation?._id?.toString()],
+                (old=[])=> 
+                    old.map((msg)=>
+                        msg._id === messageId
+                            ? {...msg, delivered: true} : msg
+                )
+            );
+        };
+
+        socket.on("messageDeliveredUpdate", handleDeliveredUpdate);
+
+        return()=>{
+            socket.off("messageDeliveredUpdate", handleDeliveredUpdate);
+        };
+        
+    },[selectedConversation])
+
+    useEffect(()=>{
         if(loggedUserData?._id){
             socket.emit("join", loggedUserData._id);
         }
@@ -92,9 +112,20 @@ const Home = () => {
     useEffect(()=>{
         const handleReceiveMessage=(newMessage)=>{
             queryClient.setQueryData(
-                ["messages", newMessage.conversation],
+                ["messages", newMessage.conversation.toString()],
                 (old=[])=>[...old, newMessage]
             );
+
+            
+
+            const isMyMessage=
+                newMessage.sender===loggedUserData?._id || newMessage.sender?._id===loggedUserData?._id;
+            
+            if(!isMyMessage){
+                socket.emit("messageDelivered", {
+                    messageId: newMessage._id,
+                });
+            }
 
             //update conversation list automatically
             queryClient.invalidateQueries({queryKey:["conversations"]});
@@ -168,10 +199,22 @@ const Home = () => {
 
     const { mutate: sendMessageMutate } = useMutation({
         mutationFn: sendMessage,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["messages", selectedConversation._id] });
-            queryClient.invalidateQueries({ queryKey: ["conversations"] });
+        onSuccess: (newMessage, variables) => {
+            const conversationId= variables.conversationId.toString();
+            //immediately update chat Ui
+            queryClient.setQueryData(
+                ["messages", conversationId],
+                (old=[])=> [...old, newMessage]
+            );
+
+            // update conversation list last message
+            queryClient.invalidateQueries({queryKey:["conversations"]});
+            
             setMessageInput("");
+
+            console.log("cache after update:",
+                queryClient.getQueryData(["messages", conversationId])
+            );
         },
     });
 
@@ -229,9 +272,14 @@ const Home = () => {
                             profileImg={otherUser?.profileImg}
                             unreadCount={ conversation.unreadCounts?.[loggedUserData?._id] || 0}
                             lastMessage={conversation.lastMessage} 
-                            onClick={() => {
+                            onClick={async () => {
                                 setSelectedConversation(conversation); 
-                                api.put(`/messages/read/${conversation._id}`)
+                                await api.put(`/messages/read/${conversation._id}`);
+                                await api.put(`/messages/seen/${conversation._id}`);
+
+                                queryClient.invalidateQueries({
+                                    queryKey: ["messages", conversation._id]
+                                });
                             }
                         }/>
                     )
@@ -272,7 +320,14 @@ const Home = () => {
                             const senderId= typeof msg.sender==="object"? msg.sender._id : msg.sender;
                             const isMe=senderId && loggedUserData?._id && senderId.toString() === loggedUserData._id.toString();
                             return(
-                            <Message key={msg._id} sender={isMe ? "me" : "other"} text={msg.text} createdAt={msg.createdAt}/>
+                                <Message 
+                                    key={msg._id} 
+                                    sender={isMe ? "me" : "other"} 
+                                    text={msg.text} 
+                                    createdAt={msg.createdAt}
+                                    seen={msg.seen}
+                                    delivered={msg.delivered}
+                                />
                             );
                         })
                     ): <p>Loading messages...</p>}

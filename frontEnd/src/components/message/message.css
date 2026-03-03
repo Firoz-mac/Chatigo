@@ -17,6 +17,21 @@
   font-size: 10px;
   color: white;
   align-self: flex-end;
+  display: flex;
+  gap: 5px;
+}
+.messageTime .tick{
+  display: flex;
+  align-items: center;
+}
+.tick .tickSent{
+  color: #ffffff;
+}
+.tick .tickDelivered{
+  color: #ffffff;
+}
+.tick .tickSeen{
+  color: #00e5ff;
 }
 .chatMessage.me {
   align-self: flex-end;
