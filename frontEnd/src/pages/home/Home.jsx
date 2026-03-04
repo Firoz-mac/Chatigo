@@ -28,6 +28,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 const Home = () => {
     const [messageInput, setMessageInput] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl]= useState(null)
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const [addChatBtnValue, setAddChatBtnValue] = useState(false);
@@ -213,6 +214,7 @@ const Home = () => {
             
             setMessageInput("");
             setSelectedFile(null);
+            setPreviewUrl(null);
 
             console.log("cache after update:",
                 queryClient.getQueryData(["messages", conversationId])
@@ -357,6 +359,19 @@ const Home = () => {
                     ): <p>Loading messages...</p>}
                     <div ref={bottomRef} />
                 </div>
+                {previewUrl && (
+                    <div className="imagePreviewContainer">
+                        <img className='imagePreview' src={previewUrl} alt="file" />
+                        <button 
+                            className='removePreview' 
+                            onClick={()=> {
+                                setSelectedFile(null);
+                                setPreviewUrl(null);
+                            }}>
+                                x
+                        </button>
+                    </div>
+                )}
                 <div className="chatInputSec">
                     <BsEmojiSmile className='emojiIcon'/>
                     <input onChange={handleMessageInput} onKeyDown={(e)=>
@@ -372,7 +387,18 @@ const Home = () => {
                     }
                     } value={messageInput} type="text" placeholder='Type a message'/>
                     <IoIosAttach  className='attachIcon' onClick={() => fileInputRef.current.click()}/>
-                    <input type="file" ref={fileInputRef} onChange={(e)=>setSelectedFile(e.target.files[0])} style={{ display: 'none' }} />
+                    <input 
+                        type="file" 
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={(e)=>{
+                            const file=e.target.files[0]
+                            if(!file) return;
+
+                            setSelectedFile(file);
+                            setPreviewUrl(URL.createObjectURL(file));
+                        }} 
+                    />
                     <div className="btn" 
                         onClick={()=>{ 
                             if ((!messageInput.trim() && !selectedFile) || !selectedConversation?._id) return;

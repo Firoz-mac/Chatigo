@@ -176,6 +176,29 @@
 .chatContent::-webkit-scrollbar {
   display: none;
 }
+
+.chat .imagePreviewContainer{
+  position: relative;
+  width: 40%;
+  margin-bottom: 8px;
+}
+.imagePreviewContainer .imagePreview{
+  width: 100%;
+  border-radius: 8px;
+}
+.imagePreviewContainer .removePreview{
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
 .chat .chatInputSec{
     width: 100%;
     display: flex;
