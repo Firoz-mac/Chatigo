@@ -26,7 +26,8 @@ import { fetchMessages, sendMessage } from './../../api/messageApi';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Home = () => {
-    const [messageInput, setMessageInput] = useState('')
+    const [messageInput, setMessageInput] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const [addChatBtnValue, setAddChatBtnValue] = useState(false);
@@ -211,6 +212,7 @@ const Home = () => {
             queryClient.invalidateQueries({queryKey:["conversations"]});
             
             setMessageInput("");
+            setSelectedFile(null);
 
             console.log("cache after update:",
                 queryClient.getQueryData(["messages", conversationId])
@@ -270,15 +272,35 @@ const Home = () => {
                             key={conversation._id} 
                             userName={otherUser?.userName} 
                             profileImg={otherUser?.profileImg}
-                            unreadCount={ conversation.unreadCounts?.[loggedUserData?._id] || 0}
+                            unreadCount={ conversation.unreadCounts?.[loggedUserData?._id?.toString()] || 0}
                             lastMessage={conversation.lastMessage} 
                             onClick={async () => {
                                 setSelectedConversation(conversation); 
                                 await api.put(`/messages/read/${conversation._id}`);
                                 await api.put(`/messages/seen/${conversation._id}`);
 
+                                queryClient.setQueryData(
+                                    ["conversation"],
+                                    (old=[])=>
+                                        old.map((conv)=>
+                                            conv._id===conversation._id
+                                                ?{
+                                                    ...conv,
+                                                    unreadCounts:{
+                                                        ...conv.unreadCounts,
+                                                        [loggedUserData._id]:0,
+                                                    },
+                                                }
+                                                :conv
+                                        )
+                                );
+
                                 queryClient.invalidateQueries({
                                     queryKey: ["messages", conversation._id]
+                                });
+
+                                queryClient.invalidateQueries({
+                                    queryKey:["conversations"]
                                 });
                             }
                         }/>
@@ -327,6 +349,8 @@ const Home = () => {
                                     createdAt={msg.createdAt}
                                     seen={msg.seen}
                                     delivered={msg.delivered}
+                                    fileUrl={msg.fileUrl}
+                                    fileType={msg.fileType}
                                 />
                             );
                         })
@@ -337,25 +361,27 @@ const Home = () => {
                     <BsEmojiSmile className='emojiIcon'/>
                     <input onChange={handleMessageInput} onKeyDown={(e)=>
                     {
-                        if(e.key==='Enter' && messageInput.trim()){
+                        if(e.key==='Enter' && (messageInput.trim() || selectedFile)){
                             sendMessageMutate({
                                 conversationId: selectedConversation._id,
                                 text: messageInput,
+                                file: selectedFile,
                             })
                         }
 
                     }
                     } value={messageInput} type="text" placeholder='Type a message'/>
                     <IoIosAttach  className='attachIcon' onClick={() => fileInputRef.current.click()}/>
-                    <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
+                    <input type="file" ref={fileInputRef} onChange={(e)=>setSelectedFile(e.target.files[0])} style={{ display: 'none' }} />
                     <div className="btn" 
                         onClick={()=>{ 
-                            if (!messageInput.trim() || !selectedConversation?._id) return;
+                            if ((!messageInput.trim() && !selectedFile) || !selectedConversation?._id) return;
 
                             sendMessageMutate({
                                 conversationId: selectedConversation._id,
                                 text: messageInput,
-                            })
+                                file: selectedFile,
+                            });
                         }}>
                         {messageInput.trim() === '' ? <MdKeyboardVoice /> : <IoMdSend />}
                     </div>

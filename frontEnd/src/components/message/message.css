@@ -8,6 +8,16 @@
   flex-direction: column;
   gap: 4px;
 }
+.chatMessage .chatImage{
+  max-width: 220px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+.chatMessage .fileLink{
+  color: white;
+  text-decoration: underline;
+  font-size: 14px;
+}
 .chatMessage.me .messageTime {
   font-size: 10px;
   color: white;

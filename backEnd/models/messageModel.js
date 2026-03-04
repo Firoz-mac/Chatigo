@@ -14,7 +14,7 @@ const messageSchema = new mongoose.Schema(
     },
     text: {
       type: String,
-      required: true,
+      default: "",
     },
     seen: {
       type: Boolean,
@@ -27,6 +27,12 @@ const messageSchema = new mongoose.Schema(
     seen: {
       type: Boolean,
       default : false,
+    },
+    fileUrl:{
+      type: String,
+    },
+    fileType:{
+      type: String,
     },
   },
   { timestamps: true }

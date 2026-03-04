@@ -7,23 +7,38 @@ const sendMessage = async (req, res) => {
   try {
     const { conversationId, text } = req.body;
     const senderId = req.user._id;
+    const file=req.file;
 
-    if (!conversationId || !text) {
+    if (!conversationId) {
       return res.status(400).json({
         success: false,
-        message: "conversationId and text are required",
+        message: "conversationId is required",
       });
+    }
+
+    if(!text && !file){
+      return res.status(400).json({
+        success:false,
+        message: "message must contain text or file",
+      })
     }
 
     // create message
 
-    const message = await Message.create({
+    const messageData = {
       conversation: conversationId,
       sender: senderId,
-      text,
+      text: text || "",
       delivered: false,
       seen: false,
-    });
+    };
+
+    if(file){
+      messageData.fileUrl=`/uploads/${file.filename}`;
+      messageData.fileType=file.mimetype;
+    }
+
+    const message= await Message.create(messageData);
 
     const io = req.app.get("io");
 
@@ -43,7 +58,8 @@ const sendMessage = async (req, res) => {
       (conversation.unreadCounts.get(receiverId.toString()) || 0)+1
     );
 
-    conversation.lastMessage=text;
+    conversation.lastMessage=file? "🔗 File" : text;
+    
     await conversation.save()
 
     //emit message to receiver room
@@ -109,20 +125,29 @@ const markAsRead = async (req,res)=>{
 const markMessagesAsSeen = async (req,res)=>{
   try{
     const{conversationId}=req.params;
-    const userId=req.user._id;
+    const userId=req.user._id.toString();
     
     await Message.updateMany(
       {
         conversation: conversationId,
         sender: {$ne:userId},
-        seen: false,
+        read: false,
       },
       {
-        $set:{seen:true},
+        read:true
       }
     );
+
+    const conversation=await Conversation.findById(conversationId);
+    if(conversation){
+      conversation.unreadCounts.set(userId, 0);
+      await conversation.save()
+    }
+
+
     res.status(200).json({ success:true });
   }catch(err){
+    console.log("read error", err)
     res.status(500).json({ success:false, message: err.message});
   }
 }

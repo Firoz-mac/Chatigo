@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
 const cors= require("cors");
+const path=require("path");
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -30,6 +31,9 @@ app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
 app.use('/conversations', conversationRoutes);
 app.use("/messages", messageRoutes);
+
+//fileUpload
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 //socket.io setup
